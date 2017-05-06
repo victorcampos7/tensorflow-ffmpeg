@@ -39,10 +39,13 @@ def _load_video_ffmpeg(filename, n_frames, target_fps, random_chunk):
     if target_fps <= 0:
         target_fps = fps
     video_length = int(video_reader.nframes * target_fps / fps)  # corrected number of frames
-    tensor_shape = (n_frames, h, w, 3)
+    tensor_shape = [n_frames, h, w, 3]
 
     # Determine starting and ending positions
-    if n_frames <= 0 or video_length < n_frames:
+    if n_frames <= 0:
+        n_frames = video_length
+        tensor_shape[0] = video_length
+    elif video_length < n_frames:
         n_frames = video_length
     elif random_chunk:  # start from a random position
         start_pos = random.randint(0, video_length - n_frames - 1)
